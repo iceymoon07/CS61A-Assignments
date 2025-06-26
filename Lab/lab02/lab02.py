@@ -1,4 +1,3 @@
-
 def composite_identity(f, g):
     """
     Return a function with one parameter x that returns True if f(g(x)) is
@@ -13,7 +12,7 @@ def composite_identity(f, g):
     >>> b1(4)                            # (4 + 1) ** 2 != 4 ** 2 + 1
     False
     """
-    "*** YOUR CODE HERE ***"
+    return lambda x: f(g(x)) == g(f(x))
 
 
 def sum_digits(y):
@@ -22,6 +21,7 @@ def sum_digits(y):
     while y > 0:
         total, y = total + y % 10, y // 10
     return total
+
 
 def is_prime(n):
     """Return whether positive integer n is prime."""
@@ -33,6 +33,7 @@ def is_prime(n):
             return False
         k += 1
     return True
+
 
 def count_cond(condition):
     """Returns a function with one parameter N that counts all the numbers from
@@ -59,7 +60,17 @@ def count_cond(condition):
     >>> count_primes(20)   # 2, 3, 5, 7, 11, 13, 17, 19
     8
     """
-    "*** YOUR CODE HERE ***"
+
+    def count_func(n):
+        i = 1
+        count = 0
+        while i <= n:
+            if condition(n, i):
+                count += 1
+            i += 1
+        return count
+
+    return count_func
 
 
 def multiple(a, b):
@@ -70,8 +81,12 @@ def multiple(a, b):
     >>> multiple(14, 21)
     42
     """
-    "*** YOUR CODE HERE ***"
-
+    bigger = max(a, b)
+    smaller = min(a, b)
+    res = bigger
+    while res % smaller != 0:
+        res += bigger
+    return res
 
 
 def cycle(f1, f2, f3):
@@ -100,5 +115,22 @@ def cycle(f1, f2, f3):
     >>> do_two_cycles(1)
     19
     """
-    "*** YOUR CODE HERE ***"
 
+    def g(n):
+        def h(x):
+            res = x
+            complete_cycle_count = n // 3
+            i = 0
+            while i < complete_cycle_count:
+                res = f3(f2(f1(res)))
+                i += 1
+            remaining_call_count = n % 3
+            if remaining_call_count == 1:
+                res = f1(res)
+            elif remaining_call_count == 2:
+                res = f2(f1(res))
+            return res
+
+        return h
+
+    return g
