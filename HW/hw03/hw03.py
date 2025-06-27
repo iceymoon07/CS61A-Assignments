@@ -24,7 +24,16 @@ def num_eights(n):
     ...       ['Assign', 'AnnAssign', 'AugAssign', 'NamedExpr', 'For', 'While'])
     True
     """
-    "*** YOUR CODE HERE ***"
+    if n % 10 == 8:
+        if n < 10:
+            return 1
+        else:
+            return num_eights(n // 10) + 1
+    else:
+        if n < 10:
+            return 0
+        else:
+            return num_eights(n // 10)
 
 
 def digit_distance(n):
@@ -46,7 +55,11 @@ def digit_distance(n):
     ...       ['For', 'While'])
     True
     """
-    "*** YOUR CODE HERE ***"
+    if n < 10:
+        return 0
+    else:
+        next_n = n // 10
+        return digit_distance(next_n) + abs(next_n % 10 - n % 10)
 
 
 def interleaved_sum(n, odd_func, even_func):
@@ -70,7 +83,16 @@ def interleaved_sum(n, odd_func, even_func):
     >>> check(HW_SOURCE_FILE, 'interleaved_sum', ['BitAnd', 'BitOr', 'BitXor']) # ban bitwise operators, don't worry about these if you don't know what they are
     True
     """
-    "*** YOUR CODE HERE ***"
+
+    def sum_k_n(k, n):
+        if k == n:
+            return odd_func(k)
+        elif k + 1 == n:
+            return odd_func(k) + even_func(k + 1)
+        else:
+            return odd_func(k) + even_func(k + 1) + sum_k_n(k + 2, n)
+
+    return sum_k_n(1, n)
 
 
 def next_smaller_dollar(bill):
@@ -85,6 +107,7 @@ def next_smaller_dollar(bill):
         return 5
     elif bill == 5:
         return 1
+
 
 def count_dollars(total):
     """Return the number of ways to make change.
@@ -106,7 +129,20 @@ def count_dollars(total):
     >>> check(HW_SOURCE_FILE, 'count_dollars', ['While', 'For'])
     True
     """
-    "*** YOUR CODE HERE ***"
+
+    def count_with_max_bill(n, max_bill):
+        if n < 0:
+            return 0
+        elif n == 0:
+            return 1
+        elif max_bill == 1:
+            return 1
+        else:
+            return count_with_max_bill(n - max_bill, max_bill) + count_with_max_bill(
+                n, next_smaller_dollar(max_bill)
+            )
+
+    return count_with_max_bill(total, 100)
 
 
 def next_larger_dollar(bill):
@@ -121,6 +157,7 @@ def next_larger_dollar(bill):
         return 50
     elif bill == 50:
         return 100
+
 
 def count_dollars_upward(total):
     """Return the number of ways to make change using bills.
@@ -142,12 +179,26 @@ def count_dollars_upward(total):
     >>> check(HW_SOURCE_FILE, 'count_dollars_upward', ['While', 'For'])
     True
     """
-    "*** YOUR CODE HERE ***"
+
+    def count_with_max_bill(n, max_bill):
+        if n < 0:
+            return 0
+        elif n == 0:
+            return 1
+        elif max_bill == None:
+            return 0
+        else:
+            return count_with_max_bill(n - max_bill, max_bill) + count_with_max_bill(
+                n, next_larger_dollar(max_bill)
+            )
+
+    return count_with_max_bill(total, 1)
 
 
 def print_move(origin, destination):
     """Print instructions to move a disk."""
     print("Move the top disk from rod", origin, "to rod", destination)
+
 
 def move_stack(n, start, end):
     """Print the moves required to move n disks on the start pole to the end
@@ -177,10 +228,28 @@ def move_stack(n, start, end):
     Move the top disk from rod 1 to rod 3
     """
     assert 1 <= start <= 3 and 1 <= end <= 3 and start != end, "Bad start/end"
-    "*** YOUR CODE HERE ***"
+    if n == 1:
+        print_move(start, end)
+        return
+
+    medium = 1
+    start_add_end = start + end
+    if start_add_end == 3:
+        medium = 3
+    elif start_add_end == 4:
+        medium = 2
+    else:
+        medium = 1
+
+    move_stack(n - 1, start, medium)
+
+    print_move(start, end)
+
+    move_stack(n - 1, medium, end)
 
 
 from operator import sub, mul
+
 
 def make_anonymous_factorial():
     """Return the value of an expression that computes factorial.
@@ -193,5 +262,6 @@ def make_anonymous_factorial():
     ...     ['Assign', 'AnnAssign', 'AugAssign', 'NamedExpr', 'FunctionDef', 'Recursion'])
     True
     """
-    return 'YOUR_EXPRESSION_HERE'
-
+    return (lambda f: (lambda x: f(lambda v: x(x)(v)))(lambda x: f(lambda v: x(x)(v))))(
+        lambda fact: lambda n: 1 if n == 1 else mul(n, fact(sub(n, 1)))
+    )
